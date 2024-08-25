@@ -4,10 +4,10 @@ import com.grupoccr.placa.model.dto.PessoaReqDTO;
 import com.grupoccr.placa.model.dto.PessoaRespDTO;
 import com.grupoccr.placa.exception.ApplicationException;
 import com.grupoccr.placa.model.dto.PessoasReqDTO;
+import com.grupoccr.placa.model.entity.Pessoa;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,25 +21,22 @@ import javax.validation.Valid;
 @Validated
 public interface PessoaAPI {
 
-	@ApiOperation(value = "Incluir registro da pessoa")
-	@PostMapping(consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	ResponseEntity<Void> incluir(
-		@Valid @RequestBody @ApiParam(value = "Dados da pessoa", required = true) PessoaReqDTO body,
-		@RequestHeader @ApiParam(value = "API-KEY", required = true) String apiKey)
-		throws ApplicationException;
+    @ApiOperation(value = "Incluir registro da pessoa", response = Pessoa.class)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<String> incluir(
+            @Valid @RequestBody @ApiParam(value = "Dados da pessoa", required = true) PessoaReqDTO body)
+            throws ApplicationException;
 
-    @Operation(summary = "Incluir registros de pessoas em lote")
-    @PostMapping(path = "/lote", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Incluir lote de pessoas", response = PessoaRespDTO.class)
+    @PostMapping(value = "/lote", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<PessoaRespDTO> incluirLote(
-            @Valid @RequestBody PessoasReqDTO body,
-            @Parameter(description = "API-KEY") @RequestHeader String apiKey)
-            throws ApplicationException;
+            @Valid @RequestBody @ApiParam(value = "Dados das pessoas", required = true) PessoasReqDTO body,
+            @RequestParam @ApiParam(value = "ID do parceiro", required = true) Long parceiroId) throws ApplicationException;
 
-    @Operation(summary = "Atualizar registro da pessoa")
-    @PutMapping(path = "/{cpfCnpj}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Atualizar dados de uma pessoa", response = PessoaRespDTO.class)
+    @PutMapping(value = "/{cpfCnpj}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<PessoaRespDTO> atualizar(
-            @Parameter(description = "CPF ou CNPJ da pessoa") @PathVariable String cpfCnpj,
-            @Valid @RequestBody PessoaReqDTO body,
-            @Parameter(description = "API-KEY") @RequestHeader String apiKey)
-            throws ApplicationException;
+            @PathVariable @ApiParam(value = "CPF/CNPJ da pessoa", required = true) String cpfCnpj,
+            @Valid @RequestBody @ApiParam(value = "Dados da pessoa", required = true) PessoaReqDTO body,
+            @RequestParam @ApiParam(value = "ID do parceiro", required = true) Long parceiroId) throws ApplicationException;
 }

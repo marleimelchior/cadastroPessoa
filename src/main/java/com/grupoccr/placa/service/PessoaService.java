@@ -11,23 +11,18 @@ import com.grupoccr.placa.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
 @Service
 public class PessoaService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PessoaService.class);
+
     @Autowired
     private PessoaRepository pessoaRepository;
-
-    @Autowired
-    private PessoaEmailRepository pessoaEmailRepository;
-
-    @Autowired
-    private PessoaTelefoneRepository pessoaTelefoneRepository;
-
-    @Autowired
-    private PessoaEnderecoRepository pessoaEnderecoRepository;
 
     @Autowired
     private ParceiroRepository parceiroRepository;
@@ -36,30 +31,34 @@ public class PessoaService {
     private PessoaMapper pessoaMapper;
 
     @Transactional
-    public void incluir(PessoaReqDTO pessoaReqDTO, String apiKey) {
-
-        Optional<Parceiro> parceiroOptional = Optional.ofNullable(parceiroRepository.findByApiKey(apiKey).orElseThrow(() ->
-                new RegistroNaoEncontradoException("API-KEY " + apiKey + "não cadastrada")));
-
-
-        pessoaReqDTO.setParceiro(parceiroOptional.get());
-        Pessoa pessoa = pessoaMapper.toEntity(pessoaReqDTO);
-        pessoa = inserirParceiro(pessoaMapper.toEntity(pessoaReqDTO), parceiroOptional.get());
-
-        pessoaRepository.save(pessoa);
-
+    public void incluir(PessoaReqDTO pessoaReqDTO) {
+        try {
+            if (pessoaRepository.existsByCpfCnpj(pessoaReqDTO.getCpfCnpj())) {
+                throw new ApplicationException("CPF/CNPJ já cadastrado");
+            }
+            Parceiro parceiro = parceiroRepository.findById(pessoaReqDTO.getParceiroId()).orElseThrow(() ->
+                    new RegistroNaoEncontradoException("Parceiro não encontrado"));
+            Pessoa pessoa = pessoaMapper.toEntity(pessoaReqDTO);
+            pessoa = inserirParceiro(pessoa, parceiro);
+            pessoa.setParceiro(parceiro);
+            pessoaRepository.save(pessoa);
+            logger.info("Pessoa salva no banco: {} com parceiro {}", pessoa, parceiro.getNome());
+        } catch (ApplicationException | RegistroNaoEncontradoException e) {
+            logger.error("Erro ao incluir pessoa: {}", e.getMessage(), e);
+            throw e; // Re-lançar a exceção para que possa ser tratada em outros lugares se necessário
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao incluir pessoa: {}", e.getMessage(), e);
+            throw new RuntimeException("Ocorreu um erro interno. Por favor, tente novamente mais tarde.", e);
+        }
     }
 
+
     @Transactional
-    public PessoaRespDTO incluirLote(PessoasReqDTO pessoasReqDTO, String apiKey) {
+    public PessoaRespDTO incluirLote(PessoasReqDTO pessoasReqDTO, Long parceiroId) {
 
-        Optional<Parceiro> parceiroOptional = parceiroRepository.findByApiKey(apiKey);
+        Parceiro parceiro = parceiroRepository.findById(parceiroId)
+                .orElseThrow(() -> new ApplicationException("Parceiro não encontrado"));
 
-        if (parceiroOptional.isEmpty()) {
-            throw new ApplicationException("API-KEY não cadastrada");
-        }
-
-        Parceiro parceiro = parceiroOptional.get();
         int registrosSalvos = 0;
 
         for (PessoaReqDTO pessoaReqDTO : pessoasReqDTO.getPessoas()) {
@@ -78,15 +77,10 @@ public class PessoaService {
     }
 
     @Transactional
-    public PessoaRespDTO atualizar(String cpfCnpj, PessoaReqDTO pessoaReqDTO, String apiKey) {
+    public PessoaRespDTO atualizar(String cpfCnpj, PessoaReqDTO pessoaReqDTO, Long parceiroId) {
 
-        Optional<Parceiro> parceiroOptional = parceiroRepository.findByApiKey(apiKey);
-
-        if (parceiroOptional.isEmpty()) {
-            throw new ApplicationException("API-KEY não cadastrada");
-        }
-
-        Parceiro parceiro = parceiroOptional.get();
+        Parceiro parceiro = parceiroRepository.findById(parceiroId)
+                .orElseThrow(() -> new ApplicationException("Parceiro não encontrado"));
 
         Pessoa pessoa = pessoaRepository.findByCpfCnpj(cpfCnpj)
                 .orElseThrow(() -> new ApplicationException("Pessoa não encontrada"));
@@ -102,27 +96,49 @@ public class PessoaService {
     }
 
     private Pessoa inserirParceiro(Pessoa pessoa, Parceiro parceiro) {
+        associarParceiroAEmails(pessoa, parceiro);
+        associarParceiroATelefones(pessoa, parceiro);
+        associarParceiroAEnderecos(pessoa, parceiro);
+        logger.info("Parceiro inserido com sucesso: {}", pessoa.getNome());
+        return pessoa;
+    }
+
+    private void associarParceiroAEmails(Pessoa pessoa, Parceiro parceiro) {
         if (pessoa.getEmails() != null) {
-            for (PessoaEmail email : pessoa.getEmails()) {
+            pessoa.getEmails().forEach(email -> {
+                logger.info("Inserindo email: {}", email.getEmail());
                 email.setParceiro(parceiro);
                 email.setPessoa(pessoa);
-            }
+            });
         }
+    }
 
+    private void associarParceiroATelefones(Pessoa pessoa, Parceiro parceiro) {
         if (pessoa.getTelefones() != null) {
-            for (PessoaTelefone telefone : pessoa.getTelefones()) {
+            pessoa.getTelefones().forEach(telefone -> {
+                logger.info("Inserindo telefone: {}", telefone.getNumero());
                 telefone.setParceiro(parceiro);
                 telefone.setPessoa(pessoa);
-            }
+            });
         }
+    }
 
+    private void associarParceiroAEnderecos(Pessoa pessoa, Parceiro parceiro) {
         if (pessoa.getEnderecos() != null) {
-            for (PessoaEndereco endereco : pessoa.getEnderecos()) {
+            pessoa.getEnderecos().forEach(endereco -> {
+                logger.info("Inserindo endereço: {}", endereco.getLogradouro());
                 endereco.setParceiro(parceiro);
                 endereco.setPessoa(pessoa);
-            }
+            });
         }
+    }
 
-        return pessoa;
+    public boolean isPessoaAssociadaAoParceiro(String cpfCnpj, Long parceiroId) {
+        Optional<Pessoa> pessoaOptional = pessoaRepository.findByCpfCnpj(cpfCnpj);
+        if (pessoaOptional.isPresent()) {
+            Pessoa pessoa = pessoaOptional.get();
+            return pessoa.getParceiro() != null && pessoa.getParceiro().getId().equals(parceiroId);
+        }
+        return false;
     }
 }

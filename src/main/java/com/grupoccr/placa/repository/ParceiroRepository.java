@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ParceiroRepository extends JpaRepository<Parceiro, Long> {
-    Optional<Parceiro> findByApiKey(String apiKey);
+    Optional<Parceiro> findById(Long id);
 }

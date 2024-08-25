@@ -23,9 +23,9 @@ public class Parceiro {
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="PARCEIRO_SEQUENCE_GENERATOR")
     @Column(name = "id_parceiro")
     private Long id;
-    @Column(name = "ds_nome", nullable = false)
+    @Column(name = "ds_nome")
     private String nome;
-    @Column(name = "co_codigo", nullable = false)
+    @Column(name = "co_codigo")
     private String codigo;
 
     @Column(name = "co_api_key", unique = true)

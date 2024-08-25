@@ -1,5 +1,6 @@
 package com.grupoccr.placa.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,15 +26,16 @@ public class PessoaEmail {
     @Column(name = "id_pessoa_email")
     private Long id;
 
-    @Column(name = "ds_email", nullable = false)
+    @Column(name = "ds_email")
     private String email;
 
     @ManyToOne
-    @JoinColumn(name = "id_parceiro", nullable = false)
+    @JoinColumn(name = "id_parceiro")
     private Parceiro parceiro;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa", nullable = false)
+    @JoinColumn(name = "id_pessoa")
+    @JsonBackReference
     private Pessoa pessoa;
 
 }

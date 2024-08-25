@@ -1,5 +1,6 @@
 package com.grupoccr.placa.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -7,6 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 @Schema(hidden = true)
 @Entity
@@ -24,17 +28,23 @@ public class PessoaTelefone {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "id_parceiro", nullable = false)
+    @JoinColumn(name = "id_parceiro")
     private Parceiro parceiro;
 
-    @Column(name = "cod_ddd", nullable = false)
+    @Column(name = "cod_ddd")
+    @NotNull(message = "O ddd é obrigatório")
+    @NotEmpty(message = "O ddd não pode ser vazio")
     private String ddd;
 
-    @Column(name = "tel_numero", nullable = false)
+    @Column(name = "tel_numero")
+    @NotNull(message = "O número é obrigatório")
+    @NotEmpty(message = "O número não pode ser vazio")
+    @Pattern(regexp = "\\d{9}", message = "O número de telefone deve ter exatamente 9 dígitos")
     private String numero;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa", nullable = false)
+    @JoinColumn(name = "id_pessoa")
+    @JsonBackReference
     private Pessoa pessoa;
 
 }

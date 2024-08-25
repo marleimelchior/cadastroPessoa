@@ -1,5 +1,6 @@
 package com.grupoccr.placa.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,22 +21,24 @@ public class Placa {
     @Column(name = "id_placa")
     private Long id;
 
-    @Column(name = "ds_placa", nullable = false)
+    @Column(name = "ds_placa")
     private String placa;
 
-    @Column(name = "ds_cpf_cnpj", nullable = false)
+    @Column(name = "ds_cpf_cnpj")
     private String cpfCnpj;
 
     @Type(type = "org.hibernate.type.NumericBooleanType")
-    @Column(nullable = false, name = "st_ativo")
+    @Column(name = "st_ativo")
+    //criar um tipo booleano no banco de dados para S ou N
     private Boolean ativo;
 
     @ManyToOne
-    @JoinColumn(name = "id_parceiro", nullable = false)
+    @JoinColumn(name = "id_parceiro")
     private Parceiro parceiro;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa", nullable = false)
+    @JoinColumn(name = "id_pessoa")
+    @JsonBackReference
     private Pessoa pessoa;
 
 }

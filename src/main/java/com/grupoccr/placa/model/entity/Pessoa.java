@@ -3,10 +3,14 @@ package com.grupoccr.placa.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Entity
@@ -22,16 +26,24 @@ public class Pessoa {
     @Column(name = "id_pessoa")
     private Long id;
 
-    @Column(name = "ds_nome", nullable = false)
+    @Column(name = "ds_nome")
+    @NotNull(message = "O nome é obrigatório")
+    @NotBlank(message = "O nome não pode ser vazio")
     private String nome;
 
-    @Column(name = "ds_cpf_cnpj", nullable = false, unique = true)
+    @Column(name = "ds_cpf_cnpj", unique = true)
+    @NotNull(message = "O cpfCnpj é obrigatório")
+    @NotEmpty(message = "O cpfCnpj não pode ser vazio")
     private String cpfCnpj;
+
+    @ManyToOne
+    @JoinColumn(name = "id_parceiro")
+    private Parceiro parceiro;
 
     @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
     private List<PessoaTelefone> telefones;
 
-    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL) @ToString.Exclude
     private List<PessoaEmail> emails;
 
     @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
@@ -43,25 +55,36 @@ public class Pessoa {
 
     private static final Logger logger = LoggerFactory.getLogger(Pessoa.class);
 
+    @Override
+    public String toString() {
+        return "Pessoa{" +
+                "id=" + id +
+                ", nome='" + nome + '\'' +
+                '}';
+    }
+
     // Método de validação de CPF e CNPJ
     public boolean isValidCpfCnpj() {
         if (this.cpfCnpj == null || this.cpfCnpj.isEmpty()) {
             logger.error("CPF/CNPJ não pode ser nulo ou vazio");
             return false;
         }
-        if (this.cpfCnpj.length() == 11) {
+
+        int length = this.cpfCnpj.length();
+        if (length == 11) {
             logger.info("Validando CPF", this.cpfCnpj);
             return isValidCPF(this.cpfCnpj);
-        } else if (this.cpfCnpj.length() == 14) {
+        } else if (length == 14) {
             logger.info("Validando CNPJ", this.cpfCnpj);
             return isValidCNPJ(this.cpfCnpj);
+        } else {
+            logger.error("O cpfCnpj deve ter 11 ou 14 caracteres", this.cpfCnpj);
+            return false;
         }
-
-        return false;
     }
-
     private boolean isValidCPF(String cpf) {
         if (cpf == null || cpf.length() != 11 || cpf.matches(cpf.charAt(0) + "{11}")) {
+            logger.error("CPF inválido", cpf);
             return false;
         }
 
@@ -76,14 +99,14 @@ public class Pessoa {
             int digit1 = sum1 % 11 < 2 ? 0 : 11 - sum1 % 11;
             sum2 += digit1 * 2;
             int digit2 = sum2 % 11 < 2 ? 0 : 11 - sum2 % 11;
-            logger.info("CPF válido", cpf);
-            return cpf.endsWith(digit1 + "" + digit2);
+            boolean isValid = cpf.endsWith(digit1 + "" + digit2);
+            logger.info("CPF {} válido", isValid ? "é" : "não é", cpf);
+            return isValid;
         } catch (NumberFormatException e) {
-            logger.error("Erro ao validar CPF", cpf);
+            logger.error("Erro ao validar CPF", e);
             return false;
         }
     }
-
     private boolean isValidCNPJ(String cnpj) {
         if (cnpj == null || cnpj.length() != 14 || cnpj.matches(cnpj.charAt(0) + "{14}")) {
             logger.error("CNPJ inválido", cnpj);
@@ -104,11 +127,13 @@ public class Pessoa {
             int digit1 = sum1 % 11 < 2 ? 0 : 11 - sum1 % 11;
             sum2 += digit1 * 2;
             int digit2 = sum2 % 11 < 2 ? 0 : 11 - sum2 % 11;
-            logger.info("CNPJ válido", cnpj);
-            return cnpj.endsWith(digit1 + "" + digit2);
+            boolean isValid = cnpj.endsWith(digit1 + "" + digit2);
+            logger.info("CNPJ {} válido", isValid ? "é" : "não é", cnpj);
+            return isValid;
         } catch (NumberFormatException e) {
-            logger.error("Erro ao validar CNPJ", cnpj);
+            logger.error("Erro ao validar CNPJ", e);
             return false;
         }
     }
+
 }
