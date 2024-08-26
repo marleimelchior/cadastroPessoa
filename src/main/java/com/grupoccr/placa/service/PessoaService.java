@@ -4,6 +4,7 @@ import com.grupoccr.placa.exception.ApplicationException;
 import com.grupoccr.placa.exception.RegistroNaoEncontradoException;
 import com.grupoccr.placa.model.dto.PessoaReqDTO;
 import com.grupoccr.placa.model.dto.PessoaRespDTO;
+import com.grupoccr.placa.model.dto.PessoaUpdateReqDTO;
 import com.grupoccr.placa.model.dto.PessoasReqDTO;
 import com.grupoccr.placa.model.entity.*;
 import com.grupoccr.placa.model.mapper.PessoaMapper;
@@ -77,23 +78,56 @@ public class PessoaService {
     }
 
     @Transactional
-    public PessoaRespDTO atualizar(String cpfCnpj, PessoaReqDTO pessoaReqDTO, Long parceiroId) {
+    public PessoaRespDTO atualizar(String cpfCnpj, PessoaUpdateReqDTO pessoaUpdateReqDTO) throws ApplicationException {
+        try {
+            // Buscar o parceiro
+            Parceiro parceiro = parceiroRepository.findById(pessoaUpdateReqDTO.getParceiroId())
+                    .orElseThrow(() -> new ApplicationException("Parceiro não encontrado"));
 
-        Parceiro parceiro = parceiroRepository.findById(parceiroId)
-                .orElseThrow(() -> new ApplicationException("Parceiro não encontrado"));
+            // Buscar a pessoa existente pelo CPF/CNPJ
+            Pessoa pessoaExistente = pessoaRepository.findByCpfCnpj(cpfCnpj)
+                    .orElseThrow(() -> new ApplicationException("Pessoa não encontrada"));
 
-        Pessoa pessoa = pessoaRepository.findByCpfCnpj(cpfCnpj)
-                .orElseThrow(() -> new ApplicationException("Pessoa não encontrada"));
+            inativarRegistrosRelacionados(pessoaExistente);
 
-        pessoaMapper.updateDtoToEntity(pessoaReqDTO, pessoa);
-        pessoa = inserirParceiro(pessoa, parceiro);
-        pessoaRepository.save(pessoa);
+            pessoaMapper.updateDtoToEntity(pessoaUpdateReqDTO, pessoaExistente);
+            pessoaExistente.setParceiro(parceiro);
 
-        PessoaRespDTO pessoaRespDTO = new PessoaRespDTO();
-        pessoaRespDTO.setMensagem("Alterado com sucesso");
+            pessoaRepository.save(pessoaExistente);
+            atualizarRegistrosRelacionados(pessoaExistente, pessoaUpdateReqDTO);
 
-        return pessoaRespDTO;
+            PessoaRespDTO pessoaRespDTO = new PessoaRespDTO();
+            pessoaRespDTO.setMensagem("Alterado com sucesso");
+
+            return pessoaRespDTO;
+        } catch (Exception e) {
+            logger.error("Erro ao atualizar pessoa com CPF/CNPJ: {}", cpfCnpj, e);
+            throw new ApplicationException("Erro ao atualizar pessoa", e);
+        }
     }
+
+    private void inativarRegistrosRelacionados(Pessoa pessoa) {
+        pessoa.getEmails().forEach(email -> {
+            email.setStAtivo("N");
+            logger.info("Inativando email: {}", email.getEmail());
+        });
+        pessoa.getTelefones().forEach(telefone -> {
+            telefone.setStAtivo("N");
+            logger.info("Inativando telefone: {}", telefone.getNumero());
+        });
+        pessoa.getEnderecos().forEach(endereco -> {
+            endereco.setStAtivo("N");
+            logger.info("Inativando endereço: {}", endereco.getLogradouro());
+        });
+        pessoaRepository.save(pessoa);
+    }
+
+    private void atualizarRegistrosRelacionados(Pessoa pessoa, PessoaUpdateReqDTO pessoaUpdateReqDTO) {
+        associarParceiroAEmails(pessoa, pessoa.getParceiro());
+        associarParceiroATelefones(pessoa, pessoa.getParceiro());
+        associarParceiroAEnderecos(pessoa, pessoa.getParceiro());
+    }
+
 
     private Pessoa inserirParceiro(Pessoa pessoa, Parceiro parceiro) {
         associarParceiroAEmails(pessoa, parceiro);
@@ -109,6 +143,7 @@ public class PessoaService {
                 logger.info("Inserindo email: {}", email.getEmail());
                 email.setParceiro(parceiro);
                 email.setPessoa(pessoa);
+                email.setStAtivo("S");
             });
         }
     }
@@ -119,6 +154,7 @@ public class PessoaService {
                 logger.info("Inserindo telefone: {}", telefone.getNumero());
                 telefone.setParceiro(parceiro);
                 telefone.setPessoa(pessoa);
+                telefone.setStAtivo("S");
             });
         }
     }
@@ -129,6 +165,7 @@ public class PessoaService {
                 logger.info("Inserindo endereço: {}", endereco.getLogradouro());
                 endereco.setParceiro(parceiro);
                 endereco.setPessoa(pessoa);
+                endereco.setStAtivo("S");
             });
         }
     }

@@ -47,4 +47,7 @@ public class PessoaTelefone {
     @JsonBackReference
     private Pessoa pessoa;
 
+    @Column(name = "st_ativo")
+    private String stAtivo;
+
 }

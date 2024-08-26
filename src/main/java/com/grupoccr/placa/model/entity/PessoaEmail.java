@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Hidden
@@ -27,6 +29,8 @@ public class PessoaEmail {
     private Long id;
 
     @Column(name = "ds_email")
+    @NotNull(message = "O email é obrigatório")
+    @NotEmpty(message = "O email não pode ser vazio")
     private String email;
 
     @ManyToOne
@@ -37,5 +41,8 @@ public class PessoaEmail {
     @JoinColumn(name = "id_pessoa")
     @JsonBackReference
     private Pessoa pessoa;
+
+    @Column(name = "st_ativo")
+    private String stAtivo;
 
 }

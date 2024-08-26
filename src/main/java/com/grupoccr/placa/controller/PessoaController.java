@@ -1,5 +1,6 @@
 package com.grupoccr.placa.controller;
 
+import com.grupoccr.placa.model.dto.PessoaUpdateReqDTO;
 import com.grupoccr.placa.model.dto.PessoaReqDTO;
 import com.grupoccr.placa.model.dto.PessoaRespDTO;
 import com.grupoccr.placa.exception.ApplicationException;
@@ -75,11 +76,10 @@ public class PessoaController implements PessoaAPI {
     @Override
     public ResponseEntity<PessoaRespDTO> atualizar(
             @PathVariable String cpfCnpj,
-            @Valid @RequestBody PessoaReqDTO body,
-            @RequestParam Long parceiroId) throws ApplicationException {
+            @Valid @RequestBody PessoaUpdateReqDTO body) throws ApplicationException {
         try {
-            logger.info("Iniciando atualização de pessoa com CPF/CNPJ: {} para parceiro ID: {}", cpfCnpj, parceiroId);
-            PessoaRespDTO response = pessoaService.atualizar(cpfCnpj, body, parceiroId);
+            logger.info("Iniciando atualização de pessoa com CPF/CNPJ: {} para parceiro ID: {}", cpfCnpj);
+            PessoaRespDTO response = pessoaService.atualizar(cpfCnpj, body);
             logger.info("Pessoa com CPF/CNPJ: {} atualizada com sucesso", cpfCnpj);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (CustomException e) {

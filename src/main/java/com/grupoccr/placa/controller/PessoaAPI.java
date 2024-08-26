@@ -3,6 +3,7 @@ package com.grupoccr.placa.controller;
 import com.grupoccr.placa.model.dto.PessoaReqDTO;
 import com.grupoccr.placa.model.dto.PessoaRespDTO;
 import com.grupoccr.placa.exception.ApplicationException;
+import com.grupoccr.placa.model.dto.PessoaUpdateReqDTO;
 import com.grupoccr.placa.model.dto.PessoasReqDTO;
 import com.grupoccr.placa.model.entity.Pessoa;
 import io.swagger.annotations.Api;
@@ -37,6 +38,5 @@ public interface PessoaAPI {
     @PutMapping(value = "/{cpfCnpj}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<PessoaRespDTO> atualizar(
             @PathVariable @ApiParam(value = "CPF/CNPJ da pessoa", required = true) String cpfCnpj,
-            @Valid @RequestBody @ApiParam(value = "Dados da pessoa", required = true) PessoaReqDTO body,
-            @RequestParam @ApiParam(value = "ID do parceiro", required = true) Long parceiroId) throws ApplicationException;
+            @Valid @RequestBody @ApiParam(value = "Dados da pessoa", required = true) PessoaUpdateReqDTO body) throws ApplicationException;
 }
