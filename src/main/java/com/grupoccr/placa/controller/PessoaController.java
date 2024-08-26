@@ -82,9 +82,16 @@ public class PessoaController implements PessoaAPI {
             PessoaRespDTO response = pessoaService.atualizar(cpfCnpj, body);
             logger.info("Pessoa com CPF/CNPJ: {} atualizada com sucesso", cpfCnpj);
             return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (CustomException e) {
-            logger.error("Erro ao atualizar pessoa com CPF/CNPJ: {}", cpfCnpj, e.getMessage());
-            throw e;
+        } catch (TransactionSystemException ex) {
+            if(ex.getRootCause() instanceof ConstraintViolationException) {
+                ConstraintViolationException constraintViolationException = (ConstraintViolationException) ex.getRootCause();
+                String errorMessage = constraintViolationException.getConstraintViolations().stream()
+                        .map(violation -> "Campo '" + violation.getPropertyPath() + "': " + violation.getMessage())
+                        .collect(Collectors.joining(", "));
+                logger.error("Erro de validação ao atualizar pessoa com CPF/CNPJ: {}", cpfCnpj, errorMessage);
+                throw new ValidationException("Erro de validação: " + errorMessage, ex);
+            }
+            throw new CustomException("Erro de validação ao atualizar pessoa, falta de campos obrigatórios");
         } catch (Exception e) {
             logger.error("Erro interno ao atualizar pessoa com CPF/CNPJ: {}", cpfCnpj, e);
             throw new CustomException("Erro interno ao atualizar pessoa");
