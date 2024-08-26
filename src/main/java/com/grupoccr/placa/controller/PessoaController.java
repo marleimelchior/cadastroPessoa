@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -57,16 +58,20 @@ public class PessoaController implements PessoaAPI {
 
     @Override
     public ResponseEntity<PessoaRespDTO> incluirLote(
-            @Valid @RequestBody PessoasReqDTO body,
-            @RequestParam Long parceiroId) throws ApplicationException {
+            @Valid @RequestBody List<PessoaReqDTO> body) throws ApplicationException {
         try {
-            logger.info("Iniciando inclusão em lote de pessoas para parceiro ID: {}", parceiroId);
-            PessoaRespDTO response = pessoaService.incluirLote(body, parceiroId);
-            logger.info("Inclusão em lote concluída com {} registros salvos", response.getRegistrosSalvos());
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (CustomException e) {
-            logger.error("Erro ao incluir lote de pessoas: {}", e.getMessage());
-            throw e;
+            PessoaRespDTO response = pessoaService.incluirLote(body);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (TransactionSystemException ex) {
+            if (ex.getRootCause() instanceof ConstraintViolationException) {
+                ConstraintViolationException constraintViolationException = (ConstraintViolationException) ex.getRootCause();
+                String errorMessage = constraintViolationException.getConstraintViolations().stream()
+                        .map(violation -> "Campo '" + violation.getPropertyPath() + "': " + violation.getMessage())
+                        .collect(Collectors.joining(", "));
+                logger.error("Erro de validação ao incluir lote de pessoas: {}", errorMessage);
+                throw new ValidationException("Erro de validação: " + errorMessage, ex);
+            }
+            throw new CustomException("Erro de validação ao incluir lote de pessoas, falta de campos obrigatórios");
         } catch (Exception e) {
             logger.error("Erro interno ao incluir lote de pessoas", e);
             throw new CustomException("Erro interno ao incluir lote de pessoas");
@@ -95,15 +100,6 @@ public class PessoaController implements PessoaAPI {
         } catch (Exception e) {
             logger.error("Erro interno ao atualizar pessoa com CPF/CNPJ: {}", cpfCnpj, e);
             throw new CustomException("Erro interno ao atualizar pessoa");
-        }
-    }
-    @GetMapping("/verificar-associacao")
-    public ResponseEntity<String> verificarAssociacao(@RequestParam String cpfCnpj, @RequestParam Long parceiroId) {
-        boolean isAssociada = pessoaService.isPessoaAssociadaAoParceiro(cpfCnpj, parceiroId);
-        if (isAssociada) {
-            return ResponseEntity.ok("Pessoa está associada ao parceiro com ID " + parceiroId);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não está associada ao parceiro com ID " + parceiroId);
         }
     }
 }

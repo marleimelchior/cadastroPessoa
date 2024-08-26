@@ -16,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Api(tags = {"Pessoa" }, description = "Serviço com o objetivo de realizar inclusão e alteração de Pessoa")
 @RequestMapping("/api/pessoa")
@@ -31,8 +32,7 @@ public interface PessoaAPI {
     @ApiOperation(value = "Incluir lote de pessoas", response = PessoaRespDTO.class)
     @PostMapping(value = "/lote", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<PessoaRespDTO> incluirLote(
-            @Valid @RequestBody @ApiParam(value = "Dados das pessoas", required = true) PessoasReqDTO body,
-            @RequestParam @ApiParam(value = "ID do parceiro", required = true) Long parceiroId) throws ApplicationException;
+            @Valid @RequestBody @ApiParam(value = "Dados das pessoas", required = true) List<PessoaReqDTO> body) throws ApplicationException;
 
     @ApiOperation(value = "Atualizar dados de uma pessoa", response = PessoaRespDTO.class)
     @PutMapping(value = "/{cpfCnpj}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

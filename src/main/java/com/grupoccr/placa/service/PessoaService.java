@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -53,28 +54,35 @@ public class PessoaService {
         }
     }
 
-
     @Transactional
-    public PessoaRespDTO incluirLote(PessoasReqDTO pessoasReqDTO, Long parceiroId) {
-
-        Parceiro parceiro = parceiroRepository.findById(parceiroId)
-                .orElseThrow(() -> new ApplicationException("Parceiro não encontrado"));
-
-        int registrosSalvos = 0;
-
-        for (PessoaReqDTO pessoaReqDTO : pessoasReqDTO.getPessoas()) {
-            Pessoa pessoa = pessoaMapper.toEntity(pessoaReqDTO);
-            pessoa = inserirParceiro(pessoa, parceiro);
-            pessoaRepository.save(pessoa);
-            registrosSalvos++;
-        }
-
+    public PessoaRespDTO incluirLote(List<PessoaReqDTO> pessoasReqDTO) {
         PessoaRespDTO pessoaRespDTO = new PessoaRespDTO();
-        pessoaRespDTO.setRegistrosSalvos(registrosSalvos);
-        pessoaRespDTO.setTotalRegistros(pessoasReqDTO.getPessoas().size());
-        pessoaRespDTO.setRegistrosInvalidos(pessoasReqDTO.getPessoas().size() - registrosSalvos);
+        int registrosSalvos = 0;
+        int totalRegistros = pessoasReqDTO.size();
 
-        return pessoaRespDTO;
+        try {
+            logger.info("Iniciando inclusão em lote de pessoas");
+
+            for (PessoaReqDTO pessoaReqDTO : pessoasReqDTO) {
+                try {
+                    incluir(pessoaReqDTO);
+                    registrosSalvos++;
+                } catch (ApplicationException | RegistroNaoEncontradoException e) {
+                    logger.error("Erro ao incluir pessoa: {}", e.getMessage(), e);
+                } catch (Exception e) {
+                    logger.error("Erro inesperado ao incluir pessoa: {}", e.getMessage(), e);
+                }
+            }
+            pessoaRespDTO.setRegistrosSalvos(registrosSalvos);
+            pessoaRespDTO.setTotalRegistros(totalRegistros);
+            pessoaRespDTO.setRegistrosInvalidos(totalRegistros - registrosSalvos);
+            logger.info("Inclusão em lote concluída. Registros salvos: {}, Registros inválidos: {}",
+                    registrosSalvos, pessoaRespDTO.getRegistrosInvalidos());
+            return pessoaRespDTO;
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao incluir lote de pessoas", e);
+            throw new RuntimeException("Ocorreu um erro interno. Por favor, tente novamente mais tarde.", e);
+        }
     }
 
     @Transactional
@@ -170,12 +178,4 @@ public class PessoaService {
         }
     }
 
-    public boolean isPessoaAssociadaAoParceiro(String cpfCnpj, Long parceiroId) {
-        Optional<Pessoa> pessoaOptional = pessoaRepository.findByCpfCnpj(cpfCnpj);
-        if (pessoaOptional.isPresent()) {
-            Pessoa pessoa = pessoaOptional.get();
-            return pessoa.getParceiro() != null && pessoa.getParceiro().getId().equals(parceiroId);
-        }
-        return false;
-    }
 }
