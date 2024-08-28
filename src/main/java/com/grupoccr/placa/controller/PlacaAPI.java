@@ -31,11 +31,6 @@ public interface PlacaAPI {
     ResponseEntity<PlacaRespDTO> incluirLote(
             @Valid @RequestBody @ApiParam(value = "Dados das placas", required = true) List<PlacaReqDTO> body) throws ApplicationException;
 
-//    @Operation(summary = "Atualizar registro da placa")
-//    @PutMapping(path = "/{cpfCnpj}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-//    ResponseEntity<PlacaRespDTO> atualizar(
-//            @Parameter(description = "CPF ou CNPJ da placa") @PathVariable String cpfCnpj,
-//            @Valid @RequestBody PlacaUpdateReqDTO body) throws ApplicationException;
 
     @ApiOperation(value = "Ativar ou desativar placa")
     @PutMapping(path = "/{placa}/status", produces = MediaType.APPLICATION_JSON_VALUE)

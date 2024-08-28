@@ -26,30 +26,38 @@ public class PlacaController implements PlacaAPI {
 
     @Override
     public ResponseEntity<PlacaRespDTO> incluir(PlacaReqDTO body) throws ApplicationException {
-        PlacaRespDTO response = placaService.incluir(body);
-        return ResponseEntity.status(201).body(response);
+        try {
+            PlacaRespDTO response = placaService.incluir(body);
+            return ResponseEntity.status(201).body(response);
+        } catch (Exception e) {
+            logger.error("Erro ao incluir placa: {}", body, e);
+            throw new ApplicationException("Erro ao incluir placa", e);
+        }
     }
 
     @Override
     public ResponseEntity<PlacaRespDTO> incluirLote(@Valid @RequestBody List<PlacaReqDTO> body) throws ApplicationException {
-        PlacaRespDTO response = placaService.incluirLote(body);
-        return ResponseEntity.status(201).body(response);
+        try {
+            PlacaRespDTO response = placaService.incluirLote(body);
+            return ResponseEntity.status(201).body(response);
+        } catch (Exception e) {
+            logger.error("Erro ao incluir lote de placas: {}", body, e);
+            throw new ApplicationException("Erro ao incluir lote de placas", e);
+        }
     }
-
-//    @Override
-//    public ResponseEntity<PlacaRespDTO> atualizar(String cpfCnpj, PlacaUpdateReqDTO body) throws ApplicationException {
-//        PlacaRespDTO response = placaService.atualizar(cpfCnpj, body);
-//        return ResponseEntity.status(201).body(response);
-//    }
 
     @Override
     public ResponseEntity<PlacaRespDTO> ativarDesativar(String placa, StatusAtivacaoEnum status) throws ApplicationException {
-        logger.info("Recebida solicitação para ativar/desativar a placa: {}", placa);
-        boolean ativo = status == StatusAtivacaoEnum.ATIVAR;
-        PlacaRespDTO response = placaService.ativarDesativar(placa, ativo);
-        logger.info("Solicitação para ativar/desativar a placa {} concluída com sucesso", placa);
-        return ResponseEntity.status(200).body(response);
+        try {
+            logger.info("Recebida solicitação para ativar/desativar a placa: {}", placa);
+            boolean ativo = status == StatusAtivacaoEnum.ATIVAR;
+            PlacaRespDTO response = placaService.ativarDesativar(placa, ativo);
+            logger.info("Solicitação para ativar/desativar a placa {} concluída com sucesso", placa);
+            return ResponseEntity.status(200).body(response);
+        } catch (Exception e) {
+            logger.error("Erro ao ativar/desativar a placa: {}", placa, e);
+            throw new ApplicationException("Erro ao ativar/desativar a placa", e);
+        }
     }
-
 
 }
