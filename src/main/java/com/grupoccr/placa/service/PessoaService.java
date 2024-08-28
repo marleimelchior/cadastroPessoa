@@ -5,7 +5,6 @@ import com.grupoccr.placa.exception.RegistroNaoEncontradoException;
 import com.grupoccr.placa.model.dto.PessoaReqDTO;
 import com.grupoccr.placa.model.dto.PessoaRespDTO;
 import com.grupoccr.placa.model.dto.PessoaUpdateReqDTO;
-import com.grupoccr.placa.model.dto.PessoasReqDTO;
 import com.grupoccr.placa.model.entity.*;
 import com.grupoccr.placa.model.mapper.PessoaMapper;
 import com.grupoccr.placa.repository.*;
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PessoaService {
@@ -47,7 +45,7 @@ public class PessoaService {
             logger.info("Pessoa salva no banco: {} com parceiro {}", pessoa, parceiro.getNome());
         } catch (ApplicationException | RegistroNaoEncontradoException e) {
             logger.error("Erro ao incluir pessoa: {}", e.getMessage(), e);
-            throw e; // Re-lançar a exceção para que possa ser tratada em outros lugares se necessário
+            throw e;
         } catch (Exception e) {
             logger.error("Erro inesperado ao incluir pessoa: {}", e.getMessage(), e);
             throw new RuntimeException("Ocorreu um erro interno. Por favor, tente novamente mais tarde.", e);

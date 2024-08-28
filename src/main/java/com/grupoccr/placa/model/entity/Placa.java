@@ -24,8 +24,8 @@ public class Placa {
     @Column(name = "ds_placa")
     private String placa;
 
-    @Column(name = "ds_cpf_cnpj")
-    private String cpfCnpj;
+//    @Column(name = "ds_cpf_cnpj")
+//    private String cpfCnpj;
 
     @Type(type = "org.hibernate.type.NumericBooleanType")
     @Column(name = "st_ativo")
