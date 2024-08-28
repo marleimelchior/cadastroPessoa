@@ -1,8 +1,10 @@
 package com.grupoccr.placa.service;
 
 import com.grupoccr.placa.exception.ApplicationException;
+import com.grupoccr.placa.exception.RegistroNaoEncontradoException;
 import com.grupoccr.placa.model.dto.PlacaReqDTO;
 import com.grupoccr.placa.model.dto.PlacaRespDTO;
+import com.grupoccr.placa.model.dto.PlacaUpdateReqDTO;
 import com.grupoccr.placa.model.dto.PlacasReqDTO;
 import com.grupoccr.placa.model.entity.*;
 import com.grupoccr.placa.model.mapper.PlacaMapper;
@@ -36,6 +38,10 @@ public class PlacaService {
     @Transactional
     public PlacaRespDTO incluir(PlacaReqDTO placaReqDTO) {
         try {
+            if(placaRepository.findByPlaca(placaReqDTO.getPlaca()).isPresent()) {
+                throw new ApplicationException("Placa já cadastrada");
+            }
+
             Placa placa = placaMapper.toEntity(placaReqDTO);
             Optional<Pessoa> pessoaOptional = pessoaRepository.findByCpfCnpj(placaReqDTO.getCpfCnpj());
             if (pessoaOptional.isEmpty()) {
@@ -59,56 +65,58 @@ public class PlacaService {
     }
 
     @Transactional
-    public PlacaRespDTO incluirLote(PlacasReqDTO placasReqDTO) {
-
-//        Optional<Parceiro> parceiroOptional = parceiroRepository.findById(id);
-
-//        if (parceiroOptional.isEmpty()) {
-//            throw new ApplicationException("API-KEY não cadastrada");
-//        }
-
-//        Parceiro parceiro = parceiroOptional.get();
-        int registrosSalvos = 0;
-
-
-        for (PlacaReqDTO placaReqDTO : placasReqDTO.getPlacas()) {
-            Placa placa = placaMapper.toEntity(placaReqDTO);
-            Optional<Pessoa> pessoaOptional = pessoaRepository.findByCpfCnpj(placaReqDTO.getCpfCnpj());
-//            if (parceiroOptional.isEmpty()) {
-//                throw new ApplicationException("API-KEY não cadastrada");
-//            }
-            placa.setPessoa(pessoaOptional.get());
-//            placa.setParceiro(parceiro);
-            placaRepository.save(placa);
-            registrosSalvos++;
-        }
-
+    public PlacaRespDTO incluirLote(List<PlacaReqDTO> placasReqDTO) {
         PlacaRespDTO placaRespDTO = new PlacaRespDTO();
-        placaRespDTO.setRegistrosSalvos(registrosSalvos);
-        placaRespDTO.setTotalRegistros(placasReqDTO.getPlacas().size());
-        placaRespDTO.setRegistrosInvalidos(placasReqDTO.getPlacas().size() - registrosSalvos);
+        int registrosSalvos = 0;
+        int totalRegistros = placasReqDTO.size();
 
-        return placaRespDTO;
+        try {
+            logger.info("Iniciando inclusão em lote de placas");
+
+            for (PlacaReqDTO placaReqDTO : placasReqDTO) {
+                try {
+                    if(placaRepository.findByPlaca(placaReqDTO.getPlaca()).isPresent()) {
+                        logger.error("Placa já cadastrada: {}", placaReqDTO.getPlaca());
+                        throw new ApplicationException("Placa já cadastrada");
+                    }
+                    incluir(placaReqDTO);
+                    registrosSalvos++;
+                } catch (ApplicationException | RegistroNaoEncontradoException e) {
+                    logger.error("Erro ao incluir placa: {}", e.getMessage(), e);
+                } catch (Exception e) {
+                    logger.error("Erro inesperado ao incluir placa: {}", e.getMessage(), e);
+                }
+            }
+            placaRespDTO.setRegistrosSalvos(registrosSalvos);
+            placaRespDTO.setTotalRegistros(totalRegistros);
+            placaRespDTO.setRegistrosInvalidos(totalRegistros - registrosSalvos);
+            logger.info("Inclusão em lote concluída. Registros salvos: {}, Registros inválidos: {}",
+                    registrosSalvos, placaRespDTO.getRegistrosInvalidos());
+            return placaRespDTO;
+        } catch (Exception e) {
+            logger.error("Erro inesperado ao incluir lote de placas", e);
+            throw new RuntimeException("Ocorreu um erro interno. Por favor, tente novamente mais tarde.", e);
+        }
     }
 
     @Transactional
-    public PlacaRespDTO atualizar(String cpfCnpj, PlacaReqDTO placaReqDTO) {
+    public PlacaRespDTO atualizar(String placa, PlacaUpdateReqDTO placaUpdateReqDTO) throws ApplicationException {
+        try {
+            // Buscar a placa existente pelo número da placa
+            Placa placaExistente = placaRepository.findByPlaca(placa)
+                    .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
 
-//        Optional<Parceiro> parceiroOptional = parceiroRepository.findById(id);
+            placaMapper.updateDtoToEntity(placaUpdateReqDTO, placaExistente);
 
-//        if (parceiroOptional.isEmpty()) {
-//            throw new ApplicationException("API-KEY não cadastrada");
-//        }
+            placaRepository.save(placaExistente);
 
-//        Placa placa = placaRepository.findByCpfCnpj(cpfCnpj)
-//                .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
+            PlacaRespDTO placaRespDTO = new PlacaRespDTO();
+            placaRespDTO.setMensagem("Alterado com sucesso");
 
-//        placaMapper.updateDtoToEntity(placaReqDTO, placa);
-//        placaRepository.save(placa);
-
-        PlacaRespDTO placaRespDTO = new PlacaRespDTO();
-        placaRespDTO.setMensagem("Alterado com sucesso");
-
-        return placaRespDTO;
+            return placaRespDTO;
+        } catch (Exception e) {
+            logger.error("Erro ao atualizar placa: {}", placa, e);
+            throw new ApplicationException("Erro ao atualizar placa", e);
+        }
     }
 }

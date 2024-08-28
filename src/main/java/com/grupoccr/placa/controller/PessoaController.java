@@ -57,8 +57,7 @@ public class PessoaController implements PessoaAPI {
     }
 
     @Override
-    public ResponseEntity<PessoaRespDTO> incluirLote(
-            @Valid @RequestBody List<PessoaReqDTO> body) throws ApplicationException {
+    public ResponseEntity<PessoaRespDTO> incluirLote(@Valid @RequestBody List<PessoaReqDTO> body) throws ApplicationException {
         try {
             PessoaRespDTO response = pessoaService.incluirLote(body);
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -79,9 +78,7 @@ public class PessoaController implements PessoaAPI {
     }
 
     @Override
-    public ResponseEntity<PessoaRespDTO> atualizar(
-            @PathVariable String cpfCnpj,
-            @Valid @RequestBody PessoaUpdateReqDTO body) throws ApplicationException {
+    public ResponseEntity<PessoaRespDTO> atualizar(@PathVariable String cpfCnpj, @Valid @RequestBody PessoaUpdateReqDTO body) throws ApplicationException {
         try {
             logger.info("Iniciando atualização de pessoa com CPF/CNPJ: {} para parceiro ID: {}", cpfCnpj);
             PessoaRespDTO response = pessoaService.atualizar(cpfCnpj, body);
