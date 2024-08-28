@@ -24,13 +24,10 @@ public class Placa {
     @Column(name = "ds_placa")
     private String placa;
 
-//    @Column(name = "ds_cpf_cnpj")
-//    private String cpfCnpj;
 
-    @Type(type = "org.hibernate.type.NumericBooleanType")
+    @Enumerated(EnumType.STRING)
     @Column(name = "st_ativo")
-    //criar um tipo booleano no banco de dados para S ou N
-    private Boolean ativo;
+    private StatusAtivo ativo;
 
     @ManyToOne
     @JoinColumn(name = "id_parceiro")
@@ -40,5 +37,9 @@ public class Placa {
     @JoinColumn(name = "id_pessoa")
     @JsonBackReference
     private Pessoa pessoa;
+
+    public void ativarDesativar(boolean ativo) {
+        this.ativo = ativo ? StatusAtivo.S : StatusAtivo.N;
+    }
 
 }

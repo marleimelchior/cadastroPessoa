@@ -99,24 +99,46 @@ public class PlacaService {
         }
     }
 
+//    @Transactional
+//    public PlacaRespDTO atualizar(String placa, PlacaUpdateReqDTO placaUpdateReqDTO) throws ApplicationException {
+//        try {
+//            // Buscar a placa existente pelo número da placa
+//            Placa placaExistente = placaRepository.findByPlaca(placa)
+//                    .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
+//
+//            placaMapper.updateDtoToEntity(placaUpdateReqDTO, placaExistente);
+//
+//            placaRepository.save(placaExistente);
+//
+//            PlacaRespDTO placaRespDTO = new PlacaRespDTO();
+//            placaRespDTO.setMensagem("Alterado com sucesso");
+//
+//            return placaRespDTO;
+//        } catch (Exception e) {
+//            logger.error("Erro ao atualizar placa: {}", placa, e);
+//            throw new ApplicationException("Erro ao atualizar placa", e);
+//        }
+//    }
     @Transactional
-    public PlacaRespDTO atualizar(String placa, PlacaUpdateReqDTO placaUpdateReqDTO) throws ApplicationException {
+    public PlacaRespDTO ativarDesativar(String placa, boolean ativo) throws ApplicationException {
         try {
-            // Buscar a placa existente pelo número da placa
+            logger.info("Iniciando ativação/desativação da placa: {}", placa);
+
             Placa placaExistente = placaRepository.findByPlaca(placa)
                     .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
 
-            placaMapper.updateDtoToEntity(placaUpdateReqDTO, placaExistente);
+            placaExistente.ativarDesativar(ativo);
 
             placaRepository.save(placaExistente);
 
             PlacaRespDTO placaRespDTO = new PlacaRespDTO();
-            placaRespDTO.setMensagem("Alterado com sucesso");
+            placaRespDTO.setMensagem(ativo ? "Placa ativada com sucesso" : "Placa desativada com sucesso");
 
+            logger.info("Status da placa atualizado com sucesso: {}", placa);
             return placaRespDTO;
         } catch (Exception e) {
-            logger.error("Erro ao atualizar placa: {}", placa, e);
-            throw new ApplicationException("Erro ao atualizar placa", e);
+            logger.error("Erro ao atualizar status da placa: {}", placa, e);
+            throw new ApplicationException("Erro ao atualizar status da placa", e);
         }
     }
 }
