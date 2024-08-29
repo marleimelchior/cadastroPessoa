@@ -11,4 +11,5 @@ public interface PlacaRepository extends JpaRepository<Placa, Long> {
 //    Optional<Placa> findByCpfCnpj(String cpfCnpj);
 //    boolean existsByCpfCnpj(String cpfCnpj);
     Optional<Placa> findByPlaca(String placa);
+    boolean existsByPlaca(String placa);
 }

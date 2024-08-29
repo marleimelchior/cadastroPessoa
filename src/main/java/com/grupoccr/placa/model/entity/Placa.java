@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "tb_placa")
@@ -22,6 +23,7 @@ public class Placa {
     private Long id;
 
     @Column(name = "ds_placa")
+    @Size(min = 7, max = 7, message = "A placa deve ter exatamente 7 caracteres")
     private String placa;
 
 
@@ -37,6 +39,12 @@ public class Placa {
     @JoinColumn(name = "id_pessoa")
     @JsonBackReference
     private Pessoa pessoa;
+
+    @PrePersist
+    @PreUpdate
+    private void formatPlaca() {
+        this.placa = this.placa.toUpperCase();
+    }
 
     public void ativarDesativar(boolean ativo) {
         this.ativo = ativo ? StatusAtivo.S : StatusAtivo.N;

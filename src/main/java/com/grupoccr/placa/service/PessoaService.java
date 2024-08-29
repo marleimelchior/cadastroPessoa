@@ -47,7 +47,7 @@ public class PessoaService {
             logger.error("Erro ao incluir pessoa: {}", e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            logger.error("Erro inesperado ao incluir pessoa: {}", e.getMessage(), e);
+            logger.error("Erro inesperado ao incluir pessoa falta de dados: {}", e.getMessage(), e);
             throw new RuntimeException("Ocorreu um erro interno. Por favor, tente novamente mais tarde.", e);
         }
     }

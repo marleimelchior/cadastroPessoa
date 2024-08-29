@@ -9,6 +9,7 @@ import com.grupoccr.placa.model.dto.PlacasReqDTO;
 import com.grupoccr.placa.model.entity.*;
 import com.grupoccr.placa.model.mapper.PlacaMapper;
 import com.grupoccr.placa.repository.*;
+import org.postgresql.largeobject.BlobOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,9 @@ public class PlacaService {
     @Transactional
     public PlacaRespDTO incluir(PlacaReqDTO placaReqDTO) {
         try {
-            if(placaRepository.findByPlaca(placaReqDTO.getPlaca()).isPresent()) {
+            logger.info("Verificando se a placa já está cadastrada: {}", placaReqDTO.getPlaca());
+            if(placaRepository.existsByPlaca(placaReqDTO.getPlaca())) {
+                logger.error("Placa já cadastrada no banco de dados: {}", placaReqDTO.getPlaca());
                 throw new ApplicationException("Placa já cadastrada");
             }
 
@@ -75,8 +78,9 @@ public class PlacaService {
 
             for (PlacaReqDTO placaReqDTO : placasReqDTO) {
                 try {
-                    if(placaRepository.findByPlaca(placaReqDTO.getPlaca()).isPresent()) {
-                        logger.error("Placa já cadastrada: {}", placaReqDTO.getPlaca());
+                    logger.info("Verificando se a placa já está cadastrado no meio do lote : {}", placaReqDTO.getPlaca());
+                    if(placaRepository.existsByPlaca(placaReqDTO.getPlaca())) {
+                        logger.error("Placa já cadastrada no banco de dados no meio do lote: {}", placaReqDTO.getPlaca());
                         throw new ApplicationException("Placa já cadastrada");
                     }
                     incluir(placaReqDTO);
@@ -99,26 +103,6 @@ public class PlacaService {
         }
     }
 
-//    @Transactional
-//    public PlacaRespDTO atualizar(String placa, PlacaUpdateReqDTO placaUpdateReqDTO) throws ApplicationException {
-//        try {
-//            // Buscar a placa existente pelo número da placa
-//            Placa placaExistente = placaRepository.findByPlaca(placa)
-//                    .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
-//
-//            placaMapper.updateDtoToEntity(placaUpdateReqDTO, placaExistente);
-//
-//            placaRepository.save(placaExistente);
-//
-//            PlacaRespDTO placaRespDTO = new PlacaRespDTO();
-//            placaRespDTO.setMensagem("Alterado com sucesso");
-//
-//            return placaRespDTO;
-//        } catch (Exception e) {
-//            logger.error("Erro ao atualizar placa: {}", placa, e);
-//            throw new ApplicationException("Erro ao atualizar placa", e);
-//        }
-//    }
     @Transactional
     public PlacaRespDTO ativarDesativar(String placa, boolean ativo) throws ApplicationException {
         try {

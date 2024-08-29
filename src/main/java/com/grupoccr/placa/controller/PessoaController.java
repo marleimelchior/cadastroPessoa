@@ -51,8 +51,8 @@ public class PessoaController implements PessoaAPI {
             logger.error("Erro ao incluir pessoa: CPF/CNPJ já cadastrado", e.getMessage());
             return new ResponseEntity<>("CPF/CNPJ ja cadastrado", HttpStatus.CONFLICT);
         } catch (Exception e) {
-            logger.error("Erro interno ao incluir pessoa", e);
-            throw new CustomException("Erro interno ao incluir pessoa");
+            logger.error("Erro ao cadastrar pessoa campos necessario", e);
+            throw new CustomException("Error ao cadastrar pessoa dados invalidos, por favor verifique os campos e tente novamente");
         }
     }
 

@@ -5,6 +5,7 @@ import com.grupoccr.placa.exception.ApplicationException;
 import com.grupoccr.placa.service.LoggerService;
 import com.grupoccr.placa.service.PlacaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
@@ -39,7 +40,8 @@ public class PlacaController implements PlacaAPI {
     public ResponseEntity<PlacaRespDTO> incluirLote(@Valid @RequestBody List<PlacaReqDTO> body) throws ApplicationException {
         try {
             PlacaRespDTO response = placaService.incluirLote(body);
-            return ResponseEntity.status(201).body(response);
+            HttpStatus status = response.getRegistrosSalvos() == 0 ? HttpStatus.BAD_REQUEST : HttpStatus.CREATED;
+            return new ResponseEntity<>(response, status);
         } catch (Exception e) {
             logger.error("Erro ao incluir lote de placas: {}", body, e);
             throw new ApplicationException("Erro ao incluir lote de placas", e);
