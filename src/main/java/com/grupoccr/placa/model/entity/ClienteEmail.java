@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PessoaEmail {
+public class ClienteEmail {
 
     @Id
     @SequenceGenerator( name="PESSOA_EMAIL_SEQUENCE_GENERATOR", sequenceName="SEQ_PESSOA_EMAIL_ID" )
@@ -40,7 +40,7 @@ public class PessoaEmail {
     @ManyToOne
     @JoinColumn(name = "id_pessoa")
     @JsonBackReference
-    private Pessoa pessoa;
+    private Cliente cliente;
 
     @Column(name = "st_ativo")
     private String stAtivo;

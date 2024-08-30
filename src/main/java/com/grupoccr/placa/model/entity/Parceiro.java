@@ -32,13 +32,13 @@ public class Parceiro {
     private String apiKey;
 
     @OneToMany(mappedBy = "parceiro", cascade = CascadeType.ALL)
-    private List<PessoaTelefone> telefones;
+    private List<ClienteTelefone> telefones;
 
     @OneToMany(mappedBy = "parceiro", cascade = CascadeType.ALL)
-    private List<PessoaEmail> emails;
+    private List<ClienteEmail> emails;
 
     @OneToMany(mappedBy = "parceiro", cascade = CascadeType.ALL)
-    private List<PessoaEndereco> enderecos;
+    private List<ClienteEndereco> enderecos;
 
     @OneToMany(mappedBy = "parceiro", cascade = CascadeType.ALL)
     private List<Placa> placas;

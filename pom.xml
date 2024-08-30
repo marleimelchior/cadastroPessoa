@@ -8,7 +8,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>cadastro-pessoa-ccr-api</name>
+    <name>cadastro-cliente-ccr-api</name>
     <description>API for registration</description>
 
     <parent>

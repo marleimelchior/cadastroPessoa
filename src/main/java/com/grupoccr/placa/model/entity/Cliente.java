@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Pessoa {
+public class Cliente {
 
     @Id
     @SequenceGenerator( name="PESSOA_SEQUENCE_GENERATOR", sequenceName="SEQ_PESSOA_ID" )
@@ -40,20 +40,20 @@ public class Pessoa {
     @JoinColumn(name = "id_parceiro")
     private Parceiro parceiro;
 
-    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private List<PessoaTelefone> telefones;
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private List<ClienteTelefone> telefones;
 
-    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL) @ToString.Exclude
-    private List<PessoaEmail> emails;
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL) @ToString.Exclude
+    private List<ClienteEmail> emails;
 
-    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
-    private List<PessoaEndereco> enderecos;
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
+    private List<ClienteEndereco> enderecos;
 
-    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     private List<Placa> placas;
 
 
-    private static final Logger logger = LoggerFactory.getLogger(Pessoa.class);
+    private static final Logger logger = LoggerFactory.getLogger(Cliente.class);
 
     @Override
     public String toString() {

@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ApiModel(value = "Pessoa", description = "A fazer")
-public class PessoaReqDTO {
+public class ClienteReqDTO {
 
     @ApiModelProperty(required = true, value = "cpfCnpj é obrigatório")
 	@NotNull(message = "O cpfCnpj é obrigatório")
@@ -26,11 +26,11 @@ public class PessoaReqDTO {
     private Long parceiroId;
 
     @Valid
-    private List<PessoaEmailDTO> emails;
+    private List<ClienteEmailDTO> emails;
 
-    private List<PessoaTelefoneDTO> telefones;
+    private List<ClienteTelefoneDTO> telefones;
 
-    private List<PessoaEnderecoDTO> enderecos;
+    private List<ClienteEnderecoDTO> enderecos;
 
 
 }

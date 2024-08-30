@@ -11,13 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(value = "ClienteUpdate", description = "Dados de pessoa para atualização")
-public class PessoaUpdateReqDTO {
+public class ClienteListReqDTO {
 
     private Long parceiroId;
 
-    private List<PessoaEmailDTO> emails;
+    private List<ClienteEmailDTO> emails;
 
-    private List<PessoaTelefoneDTO> telefones;
+    private List<ClienteTelefoneDTO> telefones;
 
-    private List<PessoaEnderecoDTO> enderecos;
+    private List<ClienteEnderecoDTO> enderecos;
 }

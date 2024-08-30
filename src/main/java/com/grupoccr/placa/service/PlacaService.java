@@ -4,12 +4,9 @@ import com.grupoccr.placa.exception.ApplicationException;
 import com.grupoccr.placa.exception.RegistroNaoEncontradoException;
 import com.grupoccr.placa.model.dto.PlacaReqDTO;
 import com.grupoccr.placa.model.dto.PlacaRespDTO;
-import com.grupoccr.placa.model.dto.PlacaUpdateReqDTO;
-import com.grupoccr.placa.model.dto.PlacasReqDTO;
 import com.grupoccr.placa.model.entity.*;
 import com.grupoccr.placa.model.mapper.PlacaMapper;
 import com.grupoccr.placa.repository.*;
-import org.postgresql.largeobject.BlobOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +26,7 @@ public class PlacaService {
     private ParceiroRepository parceiroRepository;
 
     @Autowired
-    private PessoaRepository pessoaRepository;
+    private ClienteRepository clienteRepository;
 
     @Autowired
     private PlacaMapper placaMapper;
@@ -46,13 +43,13 @@ public class PlacaService {
             }
 
             Placa placa = placaMapper.toEntity(placaReqDTO);
-            Optional<Pessoa> pessoaOptional = pessoaRepository.findByCpfCnpj(placaReqDTO.getCpfCnpj());
+            Optional<Cliente> pessoaOptional = clienteRepository.findByCpfCnpj(placaReqDTO.getCpfCnpj());
             if (pessoaOptional.isEmpty()) {
                 throw new ApplicationException("Pessoa não encontrada para o CPF/CNPJ informado");
             }
-            Pessoa pessoa = pessoaOptional.get();
-            placa.setPessoa(pessoa);
-            placa.setParceiro(pessoa.getParceiro());
+            Cliente cliente = pessoaOptional.get();
+            placa.setCliente(cliente);
+            placa.setParceiro(cliente.getParceiro());
             placaRepository.save(placa);
             PlacaRespDTO placaRespDTO = new PlacaRespDTO();
             placaRespDTO.setMensagem("Cadastrado com sucesso");

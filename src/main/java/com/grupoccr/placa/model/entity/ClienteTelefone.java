@@ -19,7 +19,7 @@ import javax.validation.constraints.Pattern;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PessoaTelefone {
+public class ClienteTelefone {
 
     @Id
     @SequenceGenerator( name="PESSOA_TELEFONE_SEQUENCE_GENERATOR", sequenceName="SEQ_PESSOA_TELEFONE_ID" )
@@ -45,7 +45,7 @@ public class PessoaTelefone {
     @ManyToOne
     @JoinColumn(name = "id_pessoa")
     @JsonBackReference
-    private Pessoa pessoa;
+    private Cliente cliente;
 
     @Column(name = "st_ativo")
     private String stAtivo;

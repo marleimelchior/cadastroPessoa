@@ -9,7 +9,7 @@ import javax.validation.constraints.Email;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PessoaEmailDTO {
+public class ClienteEmailDTO {
 
     @Email(message = "O email é inválido")
     private String email;
