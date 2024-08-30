@@ -12,10 +12,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @ApiModel(value = "Pessoa", description = "A fazer")
-public class PessoasReqDTO {
+public class ClientesReqDTO {
 
     @ApiModelProperty(required = true, value = "placas é obrigatório")
 	@NotNull(message = "O campo pessoas é obrigatório")
     @NotEmpty(message = "O campo pessoas não pode estar vazio")
-    private List<PessoaReqDTO> pessoas;
+    private List<ClienteReqDTO> pessoas;
 }

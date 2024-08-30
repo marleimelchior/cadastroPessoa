@@ -1,21 +1,19 @@
 package com.grupoccr.placa.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import com.grupoccr.placa.model.entity.Parceiro;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
 @ApiModel(value = "Pessoa", description = "A fazer")
-public class PessoaReqDTO {
+public class ClienteReqDTO {
 
     @ApiModelProperty(required = true, value = "cpfCnpj é obrigatório")
 	@NotNull(message = "O cpfCnpj é obrigatório")

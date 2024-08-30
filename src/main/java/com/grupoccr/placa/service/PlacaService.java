@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,7 +23,7 @@ public class PlacaService {
     private ParceiroRepository parceiroRepository;
 
     @Autowired
-    private PessoaRepository pessoaRepository;
+    private ClienteRepository clienteRepository;
 
     @Autowired
     private PlacaMapper placaMapper;
@@ -39,11 +38,11 @@ public class PlacaService {
         }
 
         Placa placa = placaMapper.toEntity(placaReqDTO);
-        Optional<Pessoa> pessoaOptional = pessoaRepository.findByCpfCnpj(placa.getCpfCnpj());
+        Optional<Cliente> pessoaOptional = clienteRepository.findByCpfCnpj(placa.getCpfCnpj());
         if (parceiroOptional.isEmpty()) {
             throw new ApplicationException("API-KEY não cadastrada");
         }
-        placa.setPessoa(pessoaOptional.get());
+        placa.setCliente(pessoaOptional.get());
         placa.setParceiro(parceiroOptional.get());
         placaRepository.save(placa);
 
@@ -68,11 +67,11 @@ public class PlacaService {
 
         for (PlacaReqDTO placaReqDTO : placasReqDTO.getPlacas()) {
             Placa placa = placaMapper.toEntity(placaReqDTO);
-            Optional<Pessoa> pessoaOptional = pessoaRepository.findByCpfCnpj(placa.getCpfCnpj());
+            Optional<Cliente> pessoaOptional = clienteRepository.findByCpfCnpj(placa.getCpfCnpj());
             if (parceiroOptional.isEmpty()) {
                 throw new ApplicationException("API-KEY não cadastrada");
             }
-            placa.setPessoa(pessoaOptional.get());
+            placa.setCliente(pessoaOptional.get());
             placa.setParceiro(parceiro);
             placaRepository.save(placa);
             registrosSalvos++;

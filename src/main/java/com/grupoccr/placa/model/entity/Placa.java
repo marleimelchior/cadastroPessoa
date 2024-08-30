@@ -36,6 +36,6 @@ public class Placa {
 
     @ManyToOne
     @JoinColumn(name = "id_pessoa", nullable = false)
-    private Pessoa pessoa;
+    private Cliente cliente;
 
 }

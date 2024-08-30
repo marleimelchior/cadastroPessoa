@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PessoaEndereco {
+public class ClienteEndereco {
 
     @Id
     @SequenceGenerator( name="PESSOA_ENDERECO_SEQUENCE_GENERATOR", sequenceName="SEQ_PESSOA_ENDERECO_ID" )
@@ -53,6 +53,6 @@ public class PessoaEndereco {
 
     @ManyToOne
     @JoinColumn(name = "id_pessoa", nullable = false)
-    private Pessoa pessoa;
+    private Cliente cliente;
 
 }
