@@ -101,11 +101,11 @@ public class PlacaService {
     }
 
     @Transactional
-    public PlacaRespDTO ativarDesativar(String placa, boolean ativo) throws ApplicationException {
+    public PlacaRespDTO ativarDesativar(String placa, String cpfCnpj, boolean ativo) throws ApplicationException {
         try {
-            logger.info("Iniciando ativação/desativação da placa: {}", placa);
+            logger.info("Iniciando ativação/desativação da placa: {} para CPF/CNPJ: {}", placa, cpfCnpj);
 
-            Placa placaExistente = placaRepository.findByPlaca(placa)
+            Placa placaExistente = placaRepository.findByPlacaAndCpfCnpj(placa, cpfCnpj)
                     .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
 
             placaExistente.ativarDesativar(ativo);

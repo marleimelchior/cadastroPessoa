@@ -86,47 +86,54 @@ public class ClienteService {
     @Transactional
     public ClienteRespDTO atualizar(String cpfCnpj, ClienteListReqDTO clienteListReqDTO) throws ApplicationException {
         try {
-            // Buscar o parceiro
-            Parceiro parceiro = parceiroRepository.findById(clienteListReqDTO.getParceiroId())
-                    .orElseThrow(() -> new ApplicationException("Parceiro não encontrado"));
-
-            // Buscar a Cliente existente pelo CPF/CNPJ
             Cliente clienteExistente = clienteRepository.findByCpfCnpj(cpfCnpj)
-                    .orElseThrow(() -> new ApplicationException("Cliente não encontrada"));
+                    .orElseThrow(() -> new ApplicationException("Cliente não encontrado"));
 
-            inativarRegistrosRelacionados(clienteExistente);
+            // Inativar registros relacionados
+//            inativarUltimosRegistros(clienteExistente);
 
             clienteMapper.updateDtoToEntity(clienteListReqDTO, clienteExistente);
-            clienteExistente.setParceiro(parceiro);
+
+            clienteExistente.getEmails().forEach(email -> {
+                email.setCliente(clienteExistente);
+                email.setParceiro(clienteExistente.getParceiro());
+                email.setStAtivo("S");
+            });
+            clienteExistente.getTelefones().forEach(telefone -> {
+                telefone.setCliente(clienteExistente);
+                telefone.setParceiro(clienteExistente.getParceiro());
+                telefone.setStAtivo("S");
+            });
+            clienteExistente.getEnderecos().forEach(endereco -> {
+                endereco.setCliente(clienteExistente);
+                endereco.setParceiro(clienteExistente.getParceiro());
+                endereco.setStAtivo("S");
+            });
 
             clienteRepository.save(clienteExistente);
-            atualizarRegistrosRelacionados(clienteExistente, clienteListReqDTO);
 
-            ClienteRespDTO clienteRespDTO = new ClienteRespDTO();
-            clienteRespDTO.setMensagem("Alterado com sucesso");
-
-            return clienteRespDTO;
+            return clienteMapper.toDto(clienteExistente);
         } catch (Exception e) {
             logger.error("Erro ao atualizar Cliente com CPF/CNPJ: {}", cpfCnpj, e);
             throw new ApplicationException("Erro ao atualizar Cliente", e);
         }
     }
 
-    private void inativarRegistrosRelacionados(Cliente cliente) {
-        cliente.getEmails().forEach(email -> {
-            email.setStAtivo("N");
-            logger.info("Inativando email: {}", email.getEmail());
-        });
-        cliente.getTelefones().forEach(telefone -> {
-            telefone.setStAtivo("N");
-            logger.info("Inativando telefone: {}", telefone.getNumero());
-        });
-        cliente.getEnderecos().forEach(endereco -> {
-            endereco.setStAtivo("N");
-            logger.info("Inativando endereço: {}", endereco.getLogradouro());
-        });
-        clienteRepository.save(cliente);
-    }
+//    private void inativarUltimosRegistros(Cliente cliente) {
+//        cliente.getEmails().forEach(email -> {
+//            email.setStAtivo("N");
+//            logger.info("Inativando email: {}", email.getEmail());
+//        });
+//        cliente.getTelefones().forEach(telefone -> {
+//            telefone.setStAtivo("N");
+//            logger.info("Inativando telefone: {}", telefone.getNumero());
+//        });
+//        cliente.getEnderecos().forEach(endereco -> {
+//            endereco.setStAtivo("N");
+//            logger.info("Inativando endereço: {}", endereco.getLogradouro());
+//        });
+//        clienteRepository.save(cliente);
+//    }
 
     private void atualizarRegistrosRelacionados(Cliente cliente, ClienteListReqDTO clienteListReqDTO) {
         associarParceiroAEmails(cliente, cliente.getParceiro());

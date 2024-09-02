@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tb_placa")
@@ -25,10 +26,16 @@ public class Placa {
     @Size(min = 7, max = 7, message = "A placa deve ter exatamente 7 caracteres")
     private String placa;
 
+    @Column(name = "ds_cpf_cnpj")
+    private String cpfCnpj;
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "st_ativo")
     private StatusAtivo ativo;
+
+    @Column(name = "dt_data_modificacao")
+    private LocalDateTime dataModificacao;
 
     @ManyToOne
     @JoinColumn(name = "id_parceiro")
@@ -41,8 +48,9 @@ public class Placa {
 
     @PrePersist
     @PreUpdate
-    private void formatPlaca() {
+    private void formatPlacaAndDataModificacao() {
         this.placa = this.placa.toUpperCase();
+        this.dataModificacao = LocalDateTime.now();
     }
 
     public void ativarDesativar(boolean ativo) {

@@ -36,5 +36,6 @@ public interface PlacaAPI {
     @PutMapping(path = "/{placa}/status", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<PlacaRespDTO> ativarDesativar(
             @Parameter(description = "Número da placa") @PathVariable String placa,
+            @RequestParam @Parameter(description = "CPF/CNPJ associado") String cpfCnpj,
             @RequestParam @Parameter(description = "Status de ativação") StatusAtivacaoEnum status) throws ApplicationException;
 }

@@ -42,10 +42,9 @@ public class Logger {
 
     @Column(name = "DS_HEADER", length = 4000)
     private String header;
-
+    //lembrando que vem objeto json
     @Column(name = "DS_REQUEST", length = 4000)
     private String request;
-
     @Column(name = "DS_RESPONSE", length = 4000)
     private String response;
 

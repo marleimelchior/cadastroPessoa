@@ -13,8 +13,6 @@ import java.util.List;
 @ApiModel(value = "ClienteUpdate", description = "Dados de pessoa para atualização")
 public class ClienteListReqDTO {
 
-    private Long parceiroId;
-
     private List<ClienteEmailDTO> emails;
 
     private List<ClienteTelefoneDTO> telefones;

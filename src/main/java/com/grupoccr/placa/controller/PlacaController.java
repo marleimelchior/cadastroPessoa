@@ -49,11 +49,11 @@ public class PlacaController implements PlacaAPI {
     }
 
     @Override
-    public ResponseEntity<PlacaRespDTO> ativarDesativar(String placa, StatusAtivacaoEnum status) throws ApplicationException {
+    public ResponseEntity<PlacaRespDTO> ativarDesativar(String placa, String cpfCnpj, StatusAtivacaoEnum status) throws ApplicationException {
         try {
             logger.info("Recebida solicitação para ativar/desativar a placa: {}", placa);
             boolean ativo = status == StatusAtivacaoEnum.ATIVAR;
-            PlacaRespDTO response = placaService.ativarDesativar(placa, ativo);
+            PlacaRespDTO response = placaService.ativarDesativar(placa, cpfCnpj ,ativo);
             logger.info("Solicitação para ativar/desativar a placa {} concluída com sucesso", placa);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
