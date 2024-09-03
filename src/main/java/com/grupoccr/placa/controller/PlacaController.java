@@ -2,7 +2,6 @@ package com.grupoccr.placa.controller;
 
 import com.grupoccr.placa.model.dto.*;
 import com.grupoccr.placa.exception.ApplicationException;
-import com.grupoccr.placa.service.LoggerService;
 import com.grupoccr.placa.service.PlacaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,9 +20,6 @@ public class PlacaController implements PlacaAPI {
 
     @Autowired
     private PlacaService placaService;
-
-    @Autowired
-    private LoggerService loggerService;
 
     @Override
     public ResponseEntity<PlacaRespDTO> incluir(PlacaReqDTO body) throws ApplicationException {

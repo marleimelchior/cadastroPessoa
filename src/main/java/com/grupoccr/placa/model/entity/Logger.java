@@ -1,11 +1,13 @@
 package com.grupoccr.placa.model.entity;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Entity
@@ -29,7 +31,7 @@ public class Logger {
     private Timestamp dataRequest;
 
     @Column(name = "DT_TIME_REQUEST")
-    private Timestamp timeRequest;
+    private BigDecimal timeRequest;
 
     @Column(name = "DS_TYPE")
     private String type;
@@ -40,12 +42,13 @@ public class Logger {
     @Column(name = "DS_STATUS_CODE")
     private Integer statusCode;
 
-    @Column(name = "DS_HEADER", length = 4000)
+    @Column(name = "DS_HEADER", columnDefinition = "text")
     private String header;
-    //lembrando que vem objeto json
-    @Column(name = "DS_REQUEST", length = 4000)
+
+    @Column(name = "DS_REQUEST", columnDefinition = "text")
     private String request;
-    @Column(name = "DS_RESPONSE", length = 4000)
+
+    @Column(name = "DS_RESPONSE", columnDefinition = "text")
     private String response;
 
 }
