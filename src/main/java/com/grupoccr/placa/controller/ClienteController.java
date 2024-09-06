@@ -82,6 +82,7 @@ public class ClienteController implements ClienteAPI {
             logger.info("Iniciando atualização de cliente com CPF/CNPJ: {} para parceiro ID: {}", cpfCnpj);
             ClienteRespDTO response = clienteService.atualizar(cpfCnpj, body);
             logger.info("Cliente com CPF/CNPJ: {} atualizada com sucesso", cpfCnpj);
+            response.setMensagem("Cliente atualizado com sucesso");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (TransactionSystemException ex) {
             if(ex.getRootCause() instanceof ConstraintViolationException) {
