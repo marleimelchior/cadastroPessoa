@@ -26,8 +26,16 @@ public class PlacaController implements PlacaAPI {
         try {
             PlacaRespDTO response = placaService.incluir(body);
             return ResponseEntity.status(201).body(response);
+        } catch (ApplicationException e) {
+            String errorMessage = "Erro ao incluir placa";
+            if (e.getMessage().contains("Placa já cadastrada")) {
+
+                errorMessage = "Placa já cadastrada, verifica os campos por favor";
+            }
+            logger.error(errorMessage, body, e);
+            return ResponseEntity.status(400).body(new PlacaRespDTO(errorMessage));
         } catch (Exception e) {
-            logger.error("Erro ao incluir placa: {}", body, e);
+            logger.error("Erro ao incluir placa", body, e);
             throw new ApplicationException("Erro ao incluir placa", e);
         }
     }
@@ -55,6 +63,19 @@ public class PlacaController implements PlacaAPI {
         } catch (Exception e) {
             logger.error("Erro ao ativar/desativar a placa: {}", placa, e);
             throw new ApplicationException("Erro ao ativar/desativar a placa", e);
+        }
+    }
+
+    @Override
+    public ResponseEntity<List<PlacaReqDTO>> listarTodasPlacas() throws ApplicationException {
+        try {
+            logger.info("Recebida solicitação para listar todas as placas");
+            List<PlacaReqDTO> response = placaService.listarTodasPlacas();
+            logger.info("Solicitação para listar todas as placas concluída com sucesso");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Erro ao listar todas as placas", e);
+            throw new ApplicationException("Erro ao listar todas as placas", e);
         }
     }
 

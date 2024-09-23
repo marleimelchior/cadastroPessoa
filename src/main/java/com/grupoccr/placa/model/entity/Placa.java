@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_placa")
@@ -40,6 +41,9 @@ public class Placa {
     @ManyToOne
     @JoinColumn(name = "id_parceiro")
     private Parceiro parceiro;
+
+    @OneToMany(mappedBy = "placa", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlacaConcessionaria> concessionarias;
 
     @ManyToOne
     @JoinColumn(name = "id_pessoa")

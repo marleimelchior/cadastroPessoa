@@ -1,5 +1,6 @@
 package com.grupoccr.placa.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -27,5 +28,7 @@ public class PlacaReqDTO {
     @NotNull(message = "O campo ativo é obrigatório")
 //    @NotEmpty(message = "O campo ativo não pode estar vazio")
     private Boolean ativo;
+
+    private List<PlacaConcessionariaDTO> concessionaria;
 
 }

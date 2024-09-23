@@ -62,7 +62,7 @@ public class LogInterceptor extends OncePerRequestFilter {
 
             // Capturar o conteúdo do corpo da requisição
             String requestBody = new String(wrappedRequest.getContentAsByteArray());
-
+            requestBody = requestBody.replaceAll("\u0000", "");
             // Capturar parâmetros da URL
             String queryString = request.getQueryString();
             String requestParams = (queryString == null ? "" : "?" + queryString);
@@ -76,6 +76,7 @@ public class LogInterceptor extends OncePerRequestFilter {
 
             // Capturar o conteúdo do corpo da resposta
             String responseBody = new String(wrappedResponse.getContentAsByteArray());
+            responseBody = responseBody.replaceAll("\u0000", "");
             logger.setResponse(responseBody.isEmpty() ? "[]" : responseBody);
 
             loggerRepository.save(logger);

@@ -38,4 +38,8 @@ public interface PlacaAPI {
             @Parameter(description = "Número da placa") @PathVariable String placa,
             @RequestParam @Parameter(description = "CPF/CNPJ associado") String cpfCnpj,
             @RequestParam @Parameter(description = "Status de ativação") StatusAtivacaoEnum status) throws ApplicationException;
+
+    @ApiOperation(value = "Listar todas as placas")
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<PlacaReqDTO>> listarTodasPlacas() throws ApplicationException;
 }
