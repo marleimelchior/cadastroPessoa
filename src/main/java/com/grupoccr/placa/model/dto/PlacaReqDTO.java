@@ -30,5 +30,4 @@ public class PlacaReqDTO {
     private Boolean ativo;
 
     private List<PlacaConcessionariaDTO> concessionaria;
-
 }

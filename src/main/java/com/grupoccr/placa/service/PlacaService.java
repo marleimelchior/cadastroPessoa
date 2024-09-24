@@ -116,6 +116,7 @@ public class PlacaService {
                 }
             }
             placaRespDTO.setRegistrosSalvos(registrosSalvos);
+            placaRespDTO.setMensagem("Inclusão em lote concluída");
             placaRespDTO.setTotalRegistros(totalRegistros);
             placaRespDTO.setRegistrosInvalidos(totalRegistros - registrosSalvos);
             logger.info("Inclusão em lote concluída. Registros salvos: {}, Registros inválidos: {}",
@@ -128,7 +129,7 @@ public class PlacaService {
     }
 
     @Transactional
-    public PlacaRespDTO ativarDesativar(String placa, String cpfCnpj, boolean ativo) throws ApplicationException {
+    public PlacaRespDTO alterarPlaca(String placa, String cpfCnpj, boolean ativo) throws ApplicationException {
         try {
             logger.info("Iniciando ativação/desativação da placa: {} para CPF/CNPJ: {}", placa, cpfCnpj);
 
@@ -156,10 +157,8 @@ public class PlacaService {
         logger.info("Listando todas as placas cadastradas: {}", placas.size());
         return placas.stream().map(placa -> {
             PlacaReqDTO placaReqDTO = placaMapper.toDto(placa);
-            logger.info("Listando placa: {}", placaReqDTO.getPlaca());
             List<PlacaConcessionariaDTO> concessionariaDTOs = placa.getConcessionarias().stream().map(concessionaria -> {
                 PlacaConcessionariaDTO concessionariaDTO = PlacaConcessionariaMapper.INSTANCE.toDto(concessionaria);
-                logger.info("Listando concessionária: {}", concessionariaDTO.getCodigoConcessionaria());
                 List<PracaBloqueadaDTO> pracasBloqueadasDTO = concessionaria.getPracasBloqueadas().stream()
                         .map(praca -> PracaBloqueadaMapper.INSTANCE.toDto(praca))
                         .collect(Collectors.toList());
@@ -169,7 +168,6 @@ public class PlacaService {
             }).collect(Collectors.toList());
 
             placaReqDTO.setConcessionaria(concessionariaDTOs);
-            logger.info("Placa listada com sucesso: {}", placaReqDTO.getPlaca());
             return placaReqDTO;
         }).collect(Collectors.toList());
     }

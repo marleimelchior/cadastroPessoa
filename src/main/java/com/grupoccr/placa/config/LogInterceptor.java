@@ -1,6 +1,5 @@
 package com.grupoccr.placa.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grupoccr.placa.model.entity.Logger;
 import com.grupoccr.placa.repository.LoggerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +23,6 @@ public class LogInterceptor extends OncePerRequestFilter {
 
     @Autowired
     private LoggerRepository loggerRepository;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)

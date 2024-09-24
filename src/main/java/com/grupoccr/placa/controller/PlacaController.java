@@ -47,17 +47,17 @@ public class PlacaController implements PlacaAPI {
             HttpStatus status = response.getRegistrosSalvos() == 0 ? HttpStatus.BAD_REQUEST : HttpStatus.CREATED;
             return new ResponseEntity<>(response, status);
         } catch (Exception e) {
-            logger.error("Erro ao incluir lote de placas: {}", body, e);
-            throw new ApplicationException("Erro ao incluir lote de placas", e);
+            logger.error("Erro ao incluir lote de placas, dados não persistido no DB: {}", body, e);
+            throw new ApplicationException("Erro ao incluir lote de placas, verifique os dados por favor", e);
         }
     }
 
     @Override
-    public ResponseEntity<PlacaRespDTO> ativarDesativar(String placa, String cpfCnpj, StatusAtivacaoEnum status) throws ApplicationException {
+    public ResponseEntity<PlacaRespDTO> ativarDesativar(String placa, String cpfCnpj, PlacaUpdateReqDTO body) throws ApplicationException {
         try {
             logger.info("Recebida solicitação para ativar/desativar a placa: {}", placa);
-            boolean ativo = status == StatusAtivacaoEnum.ATIVAR;
-            PlacaRespDTO response = placaService.ativarDesativar(placa, cpfCnpj ,ativo);
+            boolean ativo = body.isAtivo();
+            PlacaRespDTO response = placaService.alterarPlaca(placa, cpfCnpj, ativo);
             logger.info("Solicitação para ativar/desativar a placa {} concluída com sucesso", placa);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
