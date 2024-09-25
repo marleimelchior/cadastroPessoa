@@ -3,7 +3,6 @@ package com.grupoccr.placa.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,19 +39,15 @@ public class Cliente {
     @JoinColumn(name = "id_parceiro")
     private Parceiro parceiro;
 
-//    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ClienteTelefone> telefones;
 
-//    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL) @ToString.Exclude
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ClienteEmail> emails;
 
-//    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ClienteEndereco> enderecos;
 
-//    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL)
     @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Placa> placas;
 

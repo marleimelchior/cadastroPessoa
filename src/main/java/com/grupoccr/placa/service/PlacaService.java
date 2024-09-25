@@ -2,10 +2,7 @@ package com.grupoccr.placa.service;
 
 import com.grupoccr.placa.exception.ApplicationException;
 import com.grupoccr.placa.exception.RegistroNaoEncontradoException;
-import com.grupoccr.placa.model.dto.PlacaConcessionariaDTO;
-import com.grupoccr.placa.model.dto.PlacaReqDTO;
-import com.grupoccr.placa.model.dto.PlacaRespDTO;
-import com.grupoccr.placa.model.dto.PracaBloqueadaDTO;
+import com.grupoccr.placa.model.dto.*;
 import com.grupoccr.placa.model.entity.*;
 import com.grupoccr.placa.model.mapper.PlacaConcessionariaMapper;
 import com.grupoccr.placa.model.mapper.PlacaMapper;
@@ -17,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,9 +24,6 @@ public class PlacaService {
 
     @Autowired
     private PlacaRepository placaRepository;
-
-    @Autowired
-    private ParceiroRepository parceiroRepository;
 
     @Autowired
     private ClienteRepository clienteRepository;
@@ -129,25 +124,48 @@ public class PlacaService {
     }
 
     @Transactional
-    public PlacaRespDTO alterarPlaca(String placa, String cpfCnpj, boolean ativo) throws ApplicationException {
+    public PlacaRespDTO alterarPlaca(String placa, String cpfCnpj, PlacaUpdateReqDTO placaUpdateReqDTO) throws ApplicationException {
         try {
-            logger.info("Iniciando ativação/desativação da placa: {} para CPF/CNPJ: {}", placa, cpfCnpj);
-
+            logger.info("Iniciando atualização da placa: {} para CPF/CNPJ: {}", placa, cpfCnpj);
             Placa placaExistente = placaRepository.findByPlacaAndCpfCnpj(placa, cpfCnpj)
                     .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
 
-            placaExistente.ativarDesativar(ativo);
+            placaExistente.ativarDesativar(placaUpdateReqDTO.isAtivo());
 
+            List<PlacaConcessionaria> concessionariasExistentes = placaExistente.getConcessionarias();
+            concessionariasExistentes.clear();
+            logger.info("Removendo concessionárias existentes da placa: {}", placa);
+            for (PlacaConcessionariaDTO concessionariaDTO : placaUpdateReqDTO.getConcessionaria()) {
+                PlacaConcessionaria placaConcessionaria = new PlacaConcessionaria();
+                placaConcessionaria.setCodigoConcessionaria(concessionariaDTO.getCodigoConcessionaria());
+                placaConcessionaria.setDsConcessionaria(concessionariaDTO.getDsConcessionaria());
+                placaConcessionaria.setPlaca(placaExistente);
+                logger.info("Salvando placa concessionária: {}", placaConcessionaria.getCodigoConcessionaria());
+                List<PracaBloqueada> pracasBloqueadas = new ArrayList<>();
+                for (PracaBloqueadaDTO pracaBloqueadaDTO : concessionariaDTO.getPracasBloqueadas()) {
+                    PracaBloqueada.PracaBloqueadaId pracaBloqueadaId = new PracaBloqueada.PracaBloqueadaId(
+                            placaConcessionaria.getId(),
+                            pracaBloqueadaDTO.getCodigoPraca()
+                    );
+
+                    PracaBloqueada pracaBloqueada = new PracaBloqueada();
+                    pracaBloqueada.setId(pracaBloqueadaId);
+                    pracaBloqueada.setPlacaConcessionaria(placaConcessionaria);
+                    pracasBloqueadas.add(pracaBloqueada);
+                }
+                placaConcessionaria.setPracasBloqueadas(pracasBloqueadas);
+                concessionariasExistentes.add(placaConcessionaria);
+            }
             placaRepository.save(placaExistente);
 
             PlacaRespDTO placaRespDTO = new PlacaRespDTO();
-            placaRespDTO.setMensagem(ativo ? "Placa ativada com sucesso" : "Placa desativada com sucesso");
+            placaRespDTO.setMensagem("Placa atualizada com sucesso");
 
-            logger.info("Status da placa atualizado com sucesso: {}", placa);
+            logger.info("Placa atualizada com sucesso: {}", placa);
             return placaRespDTO;
         } catch (Exception e) {
-            logger.error("Erro ao atualizar status da placa: {}", placa, e);
-            throw new ApplicationException("Erro ao atualizar status da placa", e);
+            logger.error("Erro ao atualizar placa: {}", placa, e);
+            throw new ApplicationException("Erro ao atualizar placa", e);
         }
     }
 

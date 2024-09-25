@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,7 @@ public class PlacaConcessionaria {
     @Column(name = "ds_concessionaria")
     private String dsConcessionaria;
 
-    @OneToMany(mappedBy = "placaConcessionaria", cascade = CascadeType.ALL)
-    private List<PracaBloqueada> pracasBloqueadas;
+    @OneToMany(mappedBy = "placaConcessionaria", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PracaBloqueada> pracasBloqueadas = new ArrayList<>();
 
 }

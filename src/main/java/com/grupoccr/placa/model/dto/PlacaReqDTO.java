@@ -1,6 +1,5 @@
 package com.grupoccr.placa.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

@@ -57,7 +57,7 @@ public class PlacaController implements PlacaAPI {
         try {
             logger.info("Recebida solicitação para ativar/desativar a placa: {}", placa);
             boolean ativo = body.isAtivo();
-            PlacaRespDTO response = placaService.alterarPlaca(placa, cpfCnpj, ativo);
+            PlacaRespDTO response = placaService.alterarPlaca(placa, cpfCnpj, body);
             logger.info("Solicitação para ativar/desativar a placa {} concluída com sucesso", placa);
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
