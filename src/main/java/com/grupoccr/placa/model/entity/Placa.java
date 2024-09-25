@@ -27,10 +27,6 @@ public class Placa {
     @Size(min = 7, max = 7, message = "A placa deve ter exatamente 7 caracteres")
     private String placa;
 
-//    @Column(name = "ds_cpf_cnpj")
-//    private String cpfCnpj;
-
-
     @Enumerated(EnumType.STRING)
     @Column(name = "st_ativo")
     private StatusAtivo ativo;

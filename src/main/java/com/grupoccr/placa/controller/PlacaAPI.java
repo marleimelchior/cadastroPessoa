@@ -32,7 +32,7 @@ public interface PlacaAPI {
 
     @ApiOperation(value = "Alterar Placa")
     @PutMapping(path = "/{placa}/cpfCnpj/{cpfCnpj}", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<PlacaRespDTO> ativarDesativar(
+    ResponseEntity<PlacaRespDTO> alterarPlaca(
             @Parameter(description = "Número da placa") @PathVariable String placa,
             @Parameter(description = "CPF/CNPJ associado") @PathVariable String cpfCnpj,
             @RequestBody PlacaUpdateReqDTO body) throws ApplicationException;

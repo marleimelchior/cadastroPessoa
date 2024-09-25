@@ -53,12 +53,12 @@ public class PlacaController implements PlacaAPI {
     }
 
     @Override
-    public ResponseEntity<PlacaRespDTO> ativarDesativar(String placa, String cpfCnpj, PlacaUpdateReqDTO body) throws ApplicationException {
+    public ResponseEntity<PlacaRespDTO> alterarPlaca(String placa, String cpfCnpj, PlacaUpdateReqDTO body) throws ApplicationException {
         try {
-            logger.info("Recebida solicitação para ativar/desativar a placa: {}", placa);
+
             boolean ativo = body.isAtivo();
             PlacaRespDTO response = placaService.alterarPlaca(placa, cpfCnpj, body);
-            logger.info("Solicitação para ativar/desativar a placa {} concluída com sucesso", placa);
+            logger.info("Solicitação para atualizar placa concluída com sucesso");
             return ResponseEntity.status(200).body(response);
         } catch (Exception e) {
             logger.error("Erro ao ativar/desativar a placa: {}", placa, e);
@@ -69,7 +69,6 @@ public class PlacaController implements PlacaAPI {
     @Override
     public ResponseEntity<List<PlacaReqDTO>> listarTodasPlacas() throws ApplicationException {
         try {
-            logger.info("Recebida solicitação para listar todas as placas");
             List<PlacaReqDTO> response = placaService.listarTodasPlacas();
             logger.info("Solicitação para listar todas as placas concluída com sucesso");
             return ResponseEntity.ok(response);

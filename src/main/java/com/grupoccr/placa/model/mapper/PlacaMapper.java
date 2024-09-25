@@ -13,6 +13,7 @@ import org.mapstruct.Named;
 public interface PlacaMapper {
 
     @Mapping(source = "ativo", target = "ativo", qualifiedByName = "statusAtivoToBoolean")
+    @Mapping(source = "cliente.cpfCnpj", target = "cpfCnpj")
     PlacaReqDTO toDto(Placa placa);
 
     @Mapping(source = "ativo", target = "ativo", qualifiedByName = "booleanToStatusAtivo")
