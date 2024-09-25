@@ -27,8 +27,8 @@ public class Placa {
     @Size(min = 7, max = 7, message = "A placa deve ter exatamente 7 caracteres")
     private String placa;
 
-    @Column(name = "ds_cpf_cnpj")
-    private String cpfCnpj;
+//    @Column(name = "ds_cpf_cnpj")
+//    private String cpfCnpj;
 
 
     @Enumerated(EnumType.STRING)
@@ -46,7 +46,7 @@ public class Placa {
     private List<PlacaConcessionaria> concessionarias;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa")
+    @JoinColumn(name = "ds_cpf_cnpj", referencedColumnName = "ds_cpf_cnpj")
     @JsonBackReference
     private Cliente cliente;
 

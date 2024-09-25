@@ -127,7 +127,7 @@ public class PlacaService {
     public PlacaRespDTO alterarPlaca(String placa, String cpfCnpj, PlacaUpdateReqDTO placaUpdateReqDTO) throws ApplicationException {
         try {
             logger.info("Iniciando atualização da placa: {} para CPF/CNPJ: {}", placa, cpfCnpj);
-            Placa placaExistente = placaRepository.findByPlacaAndCpfCnpj(placa, cpfCnpj)
+            Placa placaExistente = placaRepository.findByPlacaAndCliente_CpfCnpj(placa, cpfCnpj)
                     .orElseThrow(() -> new ApplicationException("Placa não encontrada"));
 
             placaExistente.ativarDesativar(placaUpdateReqDTO.isAtivo());

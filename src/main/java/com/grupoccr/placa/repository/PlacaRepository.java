@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface PlacaRepository extends JpaRepository<Placa, Long> {
 
-    Optional<Placa> findByPlacaAndCpfCnpj(String placa, String cpfCnpj);
+    Optional<Placa> findByPlacaAndCliente_CpfCnpj(String placa, String cpfCnpj);
     boolean existsByPlaca(String placa);
 
     List<Placa> findAll();

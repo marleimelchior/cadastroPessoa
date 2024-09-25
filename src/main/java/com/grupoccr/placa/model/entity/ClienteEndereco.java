@@ -70,7 +70,7 @@ public class ClienteEndereco {
     private String tipo;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa")
+    @JoinColumn(name = "ds_cpf_cnpj")
     @JsonBackReference
     private Cliente cliente;
 

@@ -20,20 +20,15 @@ import java.util.List;
 public class Cliente {
 
     @Id
-    @SequenceGenerator( name="PESSOA_SEQUENCE_GENERATOR", sequenceName="SEQ_PESSOA_ID" )
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="PESSOA_SEQUENCE_GENERATOR")
-    @Column(name = "id_pessoa")
-    private Long id;
+    @Column(name = "ds_cpf_cnpj", unique = true)
+    @NotNull(message = "O cpfCnpj é obrigatório")
+    @NotEmpty(message = "O cpfCnpj não pode ser vazio")
+    private String cpfCnpj;
 
     @Column(name = "ds_nome")
     @NotNull(message = "O nome é obrigatório")
     @NotBlank(message = "O nome não pode ser vazio")
     private String nome;
-
-    @Column(name = "ds_cpf_cnpj", unique = true)
-    @NotNull(message = "O cpfCnpj é obrigatório")
-    @NotEmpty(message = "O cpfCnpj não pode ser vazio")
-    private String cpfCnpj;
 
     @ManyToOne
     @JoinColumn(name = "id_parceiro")
@@ -57,7 +52,7 @@ public class Cliente {
     @Override
     public String toString() {
         return "Pessoa{" +
-                "id=" + id +
+                "cpfCnpj='" + cpfCnpj + '\'' +
                 ", nome='" + nome + '\'' +
                 '}';
     }

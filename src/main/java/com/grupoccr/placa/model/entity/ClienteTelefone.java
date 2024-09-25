@@ -43,7 +43,7 @@ public class ClienteTelefone {
     private String numero;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa")
+    @JoinColumn(name = "ds_cpf_cnpj")
     @JsonBackReference
     private Cliente cliente;
 

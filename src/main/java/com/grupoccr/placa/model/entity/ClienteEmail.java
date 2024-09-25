@@ -38,7 +38,7 @@ public class ClienteEmail {
     private Parceiro parceiro;
 
     @ManyToOne
-    @JoinColumn(name = "id_pessoa")
+    @JoinColumn(name = "ds_cpf_cnpj")
     @JsonBackReference
     private Cliente cliente;
 
